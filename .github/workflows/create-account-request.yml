@@ -137,7 +137,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AFT_AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AFT_AWS_SECRET_ACCESS_KEY }}
           aws-region: ap-south-1
-          role-to-assume: arn:aws:iam::809574937450:role/AWSControlTowerExecution
           role-session-name: GitHubActionsAFT
       
       - name: Trigger AFT CodePipeline
