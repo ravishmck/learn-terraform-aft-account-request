@@ -185,3 +185,37 @@ module "aft_prod_account" {
 
   account_customizations_name = "sandbox"
 }
+
+# WORKING TEST - Event Source Mapping Re-enabled
+# Created: 2025-12-08 10:12 - Fresh event for re-enabled mapping
+module "aft_final_test" {
+  source = "./modules/aft-account-request"
+
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+final@gmail.com"
+    AccountName               = "FinalTestAccount"
+    ManagedOrganizationalUnit = "AFTLearn"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+
+  account_tags = {
+    "Environment" = "Test"
+    "ManagedBy"   = "AFT"
+    "Status"      = "AllPermissionsFixed"
+    "MappingState" = "ReEnabled"
+  }
+
+  change_management_parameters = {
+    change_requested_by = "Ravish Sankhyan"
+    change_reason       = "Final test with re-enabled Event Source Mapping"
+  }
+
+  custom_fields = {
+    test_number = "6"
+    mapping_reset = "true"
+  }
+
+  account_customizations_name = "sandbox"
+}
