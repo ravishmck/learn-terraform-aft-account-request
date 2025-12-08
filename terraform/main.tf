@@ -208,3 +208,41 @@ module "test1408_1765186022" {
 
   account_customizations_name = "sandbox"
 }
+
+# ═══════════════════════════════════════════════════════════════
+# Fresh Test Account
+# Created: 2025-12-08 15:16:08
+# Purpose: End-to-end automation test
+# ═══════════════════════════════════════════════════════════════
+module "freshtest7168" {
+  source = "./modules/aft-account-request"
+
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+freshtest1765187168@gmail.com"
+    AccountName               = "FreshTest7168"
+    ManagedOrganizationalUnit = "LearnMck"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+
+  account_tags = {
+    "Environment"  = "Test"
+    "ManagedBy"    = "AFT"
+    "RequestedBy"  = "Automation"
+    "CreatedDate"  = "2025-12-08"
+    "TestType"     = "FreshEndToEnd"
+  }
+
+  change_management_parameters = {
+    change_requested_by = "AFT-Automation"
+    change_reason       = "Fresh end-to-end test of complete automation"
+  }
+
+  custom_fields = {
+    test_type = "fresh_e2e"
+    timestamp = "1765187168"
+  }
+
+  account_customizations_name = "sandbox"
+}
