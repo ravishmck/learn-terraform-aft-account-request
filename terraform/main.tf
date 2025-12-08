@@ -219,3 +219,25 @@ module "aft_final_test" {
 
   account_customizations_name = "sandbox"
 }
+
+# ABSOLUTE FINAL TEST - 09:55 - All 6 IAM Permissions Fixed
+module "working_account" {
+  source = "./modules/aft-account-request"
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+working@gmail.com"
+    AccountName               = "WorkingAccount"
+    ManagedOrganizationalUnit = "AFTLearn"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+  account_tags = {
+    "Test" = "Final"
+  }
+  change_management_parameters = {
+    change_requested_by = "System"
+    change_reason       = "Final working test"
+  }
+  custom_fields = {}
+  account_customizations_name = "sandbox"
+}
