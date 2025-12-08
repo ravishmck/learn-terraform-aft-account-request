@@ -151,3 +151,37 @@ module "aft_dev_account" {
 
   account_customizations_name = "sandbox"
 }
+
+# FINAL TEST - All IAM Permissions Fixed
+# Created: 2025-12-08 10:05 after fixing KMS + SSM permissions
+module "aft_prod_account" {
+  source = "./modules/aft-account-request"
+
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+prod@gmail.com"
+    AccountName               = "ProdTestAccount"
+    ManagedOrganizationalUnit = "AFTLearn"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+
+  account_tags = {
+    "Environment" = "Production"
+    "ManagedBy"   = "AFT"
+    "Purpose"     = "Final test after all IAM fixes"
+    "TestRun"     = "5"
+  }
+
+  change_management_parameters = {
+    change_requested_by = "Ravish Sankhyan"
+    change_reason       = "Testing AFT with complete IAM permissions (KMS+SSM+DynamoDB+STS)"
+  }
+
+  custom_fields = {
+    final_test = "true"
+    permissions_fixed = "kms-ssm-dynamodb-sts"
+  }
+
+  account_customizations_name = "sandbox"
+}
