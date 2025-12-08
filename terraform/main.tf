@@ -118,3 +118,36 @@ module "aft_test_01" {
 
 # Automation test - EventBridge integration
 # This push should automatically trigger the pipeline!
+
+# Fresh Account Request - Testing DynamoDB Stream
+# Created: 2025-12-08 for testing stream processing
+module "aft_dev_account" {
+  source = "./modules/aft-account-request"
+
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+dev@gmail.com"
+    AccountName               = "DevTestAccount"
+    ManagedOrganizationalUnit = "AFTLearn"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+
+  account_tags = {
+    "Environment" = "Dev"
+    "ManagedBy"   = "AFT"
+    "Purpose"     = "Testing DynamoDB Stream"
+    "Created"     = "2025-12-08"
+  }
+
+  change_management_parameters = {
+    change_requested_by = "Ravish Sankhyan"
+    change_reason       = "Testing DynamoDB Stream processing after IAM fix"
+  }
+
+  custom_fields = {
+    test_stream = "true"
+  }
+
+  account_customizations_name = "sandbox"
+}
