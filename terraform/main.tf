@@ -58,50 +58,40 @@ module "learn_aft_test" {
 # Date: $(date '+%Y-%m-%d')
 # By: ravishmck
 # ═══════════════════════════════════════════════════════════════
-# Commented out - Can be restored if needed
-# 
-# ═══════════════════════════════════════════════════════════════
-# DECOMMISSIONED: ravish.snkhyn+autotest1140@gmail.com
-# Reason: not used
-# Date: $(date '+%Y-%m-%d')
-# By: ravishmck
-# ═══════════════════════════════════════════════════════════════
-# Commented out - Can be restored if needed
+# Fully commented out - Can be restored if needed
 # module "automated_test_account" {
-# #   source = "./modules/aft-account-request"
-# # 
-# #   control_tower_parameters = {
-# #     AccountEmail              = "ravish.snkhyn+autotest1140@gmail.com"
-# #     AccountName               = "AutomatedTest"
-# #     ManagedOrganizationalUnit = "LearnMck"
-# #     SSOUserEmail              = "ravish.snkhyn@gmail.com"
-# #     SSOUserFirstName          = "Ravish"
-# #     SSOUserLastName           = "Sankhyan"
-# #   }
-
-
-
-  account_tags = {
-    "Environment" = "Test"
-    "ManagedBy"   = "AFT"
-    "RequestedBy" = "ravishmck"
-    "CreatedDate" = "2025-12-08"
-    "Purpose"     = "End-to-End Auto-Trigger Test"
-    "TestType"    = "Complete-Automation"
-  }
-
-  change_management_parameters = {
-    change_requested_by = "ravishmck"
-    change_reason       = "Final E2E test: GitHub → Pipeline → DynamoDB → SQS → Lambda → Service Catalog → Organizations"
-  }
-
-  custom_fields = {
-    test_type = "full_e2e_automation"
-    auto_trigger_test = "true"
-  }
-
-  account_customizations_name = "sandbox"
-}
+#   source = "./modules/aft-account-request"
+# 
+#   control_tower_parameters = {
+#     AccountEmail              = "ravish.snkhyn+autotest1140@gmail.com"
+#     AccountName               = "AutomatedTest"
+#     ManagedOrganizationalUnit = "LearnMck"
+#     SSOUserEmail              = "ravish.snkhyn@gmail.com"
+#     SSOUserFirstName          = "Ravish"
+#     SSOUserLastName           = "Sankhyan"
+#   }
+#
+#   account_tags = {
+#     "Environment" = "Test"
+#     "ManagedBy"   = "AFT"
+#     "RequestedBy" = "ravishmck"
+#     "CreatedDate" = "2025-12-08"
+#     "Purpose"     = "End-to-End Auto-Trigger Test"
+#     "TestType"    = "Complete-Automation"
+#   }
+#
+#   change_management_parameters = {
+#     change_requested_by = "ravishmck"
+#     change_reason       = "Final E2E test: GitHub → Pipeline → DynamoDB → SQS → Lambda → Service Catalog → Organizations"
+#   }
+#
+#   custom_fields = {
+#     test_type = "full_e2e_automation"
+#     auto_trigger_test = "true"
+#   }
+#
+#   account_customizations_name = "sandbox"
+# }
 
 # Test auto-trigger - updated at $(date)
 # Auto-trigger test at Mon Dec  8 11:31:36 IST 2025
