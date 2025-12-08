@@ -51,17 +51,26 @@ module "learn_aft_test" {
 # Created: 2025-12-08 11:40:00 UTC
 # Requested by: ravishmck
 # Testing complete end-to-end AFT automation with auto-trigger
-module "automated_test_account" {
-  source = "./modules/aft-account-request"
 
-  control_tower_parameters = {
-    AccountEmail              = "ravish.snkhyn+autotest1140@gmail.com"
-    AccountName               = "AutomatedTest"
-    ManagedOrganizationalUnit = "LearnMck"
-    SSOUserEmail              = "ravish.snkhyn@gmail.com"
-    SSOUserFirstName          = "Ravish"
-    SSOUserLastName           = "Sankhyan"
-  }
+# ═══════════════════════════════════════════════════════════════
+# DECOMMISSIONED: ravish.snkhyn+autotest1140@gmail.com
+# Reason: not used
+# Date: $(date '+%Y-%m-%d')
+# By: ravishmck
+# ═══════════════════════════════════════════════════════════════
+# Commented out - Can be restored if needed
+# module "automated_test_account" {
+#   source = "./modules/aft-account-request"
+# 
+#   control_tower_parameters = {
+#     AccountEmail              = "ravish.snkhyn+autotest1140@gmail.com"
+#     AccountName               = "AutomatedTest"
+#     ManagedOrganizationalUnit = "LearnMck"
+#     SSOUserEmail              = "ravish.snkhyn@gmail.com"
+#     SSOUserFirstName          = "Ravish"
+#     SSOUserLastName           = "Sankhyan"
+#   }
+
 
   account_tags = {
     "Environment" = "Test"
