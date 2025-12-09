@@ -1,0 +1,215 @@
+name: 🚀 Process Bulk Accounts CSV
+
+# Automatically processes bulk-accounts.csv when it's updated
+on:
+  push:
+    paths:
+      - 'bulk-accounts.csv'
+  workflow_dispatch:
+
+jobs:
+  process-csv:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+      
+      - name: 🔧 Configure Git
+        run: |
+          git config user.name "AFT Bulk Automation"
+          git config user.email "aft-bulk@github.com"
+      
+      - name: 📋 Read and Validate CSV
+        id: read_csv
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "📊 PROCESSING BULK ACCOUNTS CSV FILE"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          if [ ! -f bulk-accounts.csv ]; then
+            echo "❌ Error: bulk-accounts.csv file not found!"
+            exit 1
+          fi
+          
+          echo "📁 File found: bulk-accounts.csv"
+          echo ""
+          
+          # Count valid entries (skip header and comments)
+          VALID_ENTRIES=$(grep -v '^#' bulk-accounts.csv | grep -v '^AccountName' | grep -v '^[[:space:]]*$' | wc -l | tr -d ' ')
+          
+          echo "📊 Found $VALID_ENTRIES account(s) to create"
+          echo ""
+          
+          if [ "$VALID_ENTRIES" -eq 0 ]; then
+            echo "⚠️  No accounts to process (all lines are comments or header)"
+            echo "   Edit bulk-accounts.csv and remove # from account lines"
+            exit 0
+          fi
+          
+          echo "account_count=$VALID_ENTRIES" >> $GITHUB_OUTPUT
+          
+          # Display accounts to be created
+          echo "Accounts to create:"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          grep -v '^#' bulk-accounts.csv | grep -v '^AccountName' | grep -v '^[[:space:]]*$' | while IFS=',' read -r NAME EMAIL OU ENV; do
+            echo "  • $NAME → $OU ($ENV)"
+          done
+      
+      - name: 📝 Generate Terraform Modules
+        id: generate
+        run: |
+          TIMESTAMP=$(date +%s)
+          GITHUB_ACTOR="${{ github.actor }}"
+          GITHUB_RUN_ID="${{ github.run_id }}"
+          COUNTER=0
+          ACCOUNT_NAMES=""
+          
+          echo ""
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "🔧 GENERATING TERRAFORM MODULES"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          
+          # Process CSV file (skip header and comments)
+          grep -v '^#' bulk-accounts.csv | grep -v '^AccountName' | grep -v '^[[:space:]]*$' | while IFS=',' read -r NAME EMAIL OU ENV; do
+            # Trim whitespace
+            NAME=$(echo "$NAME" | xargs)
+            EMAIL=$(echo "$EMAIL" | xargs)
+            OU=$(echo "$OU" | xargs)
+            ENV=$(echo "$ENV" | xargs)
+            
+            COUNTER=$((COUNTER + 1))
+            
+            # Generate safe module name
+            MODULE_NAME=$(echo "$NAME" | tr '[:upper:]' '[:lower:]' | tr ' ' '_' | tr -cd '[:alnum:]_')
+            MODULE_NAME="${MODULE_NAME}_${TIMESTAMP}_${COUNTER}"
+            
+            echo "[$COUNTER] $NAME ($EMAIL)"
+            
+            # Append to main.tf
+            cat >> terraform/main.tf << EOF
+          
+          # ═══════════════════════════════════════════════════════════════
+          # Bulk CSV #${COUNTER}: $NAME
+          # Created: $(date '+%Y-%m-%d %H:%M:%S UTC')
+          # From: bulk-accounts.csv
+          # ═══════════════════════════════════════════════════════════════
+          module "${MODULE_NAME}" {
+            source = "./modules/aft-account-request"
+          
+            control_tower_parameters = {
+              AccountEmail              = "$EMAIL"
+              AccountName               = "$NAME"
+              ManagedOrganizationalUnit = "$OU"
+              SSOUserEmail              = "ravish.snkhyn@gmail.com"
+              SSOUserFirstName          = "Ravish"
+              SSOUserLastName           = "Sankhyan"
+            }
+          
+            account_tags = {
+              "Environment"  = "$ENV"
+              "ManagedBy"    = "AFT"
+              "RequestedBy"  = "${GITHUB_ACTOR}"
+              "CreatedDate"  = "$(date +%Y-%m-%d)"
+              "CreatedVia"   = "GitHub-Actions-CSV-File"
+              "BatchNumber"  = "$TIMESTAMP"
+            }
+          
+            change_management_parameters = {
+              change_requested_by = "${GITHUB_ACTOR}"
+              change_reason       = "Bulk creation from CSV file"
+            }
+          
+            custom_fields = {
+              workflow_run_id = "${GITHUB_RUN_ID}"
+              batch_timestamp = "$TIMESTAMP"
+              csv_source      = "bulk-accounts.csv"
+            }
+          
+            account_customizations_name = "sandbox"
+          }
+          EOF
+            
+            echo "  ✅ Module created"
+          done
+          
+          # Get actual count
+          ACTUAL_COUNT=$(grep -v '^#' bulk-accounts.csv | grep -v '^AccountName' | grep -v '^[[:space:]]*$' | wc -l | tr -d ' ')
+          echo "final_count=$ACTUAL_COUNT" >> $GITHUB_OUTPUT
+          
+          echo ""
+          echo "✅ Generated $ACTUAL_COUNT Terraform modules"
+      
+      - name: 🧹 Clear CSV File
+        run: |
+          echo "Clearing processed entries from CSV..."
+          
+          # Reset CSV file to template
+          cat > bulk-accounts.csv << 'EOF'
+          AccountName,AccountEmail,OrganizationalUnit,Environment
+          # Add your account requests below (remove the # to activate):
+          # Example1,user+ex1@gmail.com,LearnMck,Development
+          # Example2,user+ex2@gmail.com,Sandbox,Testing
+          EOF
+          
+          echo "✅ CSV file reset to template"
+      
+      - name: 💾 Commit & Push
+        run: |
+          # Pull latest changes
+          git pull --rebase origin main || true
+          
+          git add terraform/main.tf bulk-accounts.csv
+          
+          COMMIT_MSG="🚀 Bulk Account Creation from CSV
+          
+          📊 Processed: ${{ steps.generate.outputs.final_count }} accounts
+          🔧 Requested by: ${{ github.actor }}
+          📅 Date: $(date '+%Y-%m-%d %H:%M:%S')
+          
+          ✅ CSV file reset for next batch"
+          
+          git commit -m "$COMMIT_MSG" || echo "No changes to commit"
+          
+          # Push with retry
+          for i in {1..5}; do
+            if git push; then
+              echo "✅ Changes pushed successfully!"
+              break
+            else
+              echo "⚠️  Retry $i/5..."
+              git pull --rebase origin main
+              sleep 2
+            fi
+          done
+      
+      - name: 🎉 Summary
+        run: |
+          cat >> $GITHUB_STEP_SUMMARY << 'EOF'
+          ## 🎉 Bulk CSV Processing Complete!
+          
+          ### 📋 Summary
+          | Metric | Value |
+          |--------|-------|
+          | **Accounts Created** | ${{ steps.generate.outputs.final_count }} |
+          | **Source** | bulk-accounts.csv |
+          | **Requested By** | @${{ github.actor }} |
+          
+          ### ✅ Next Steps
+          - Accounts will be created in ~15-20 minutes
+          - Each account gets $200/month budget automatically
+          - Email alerts configured at 80%, 90%, 100%
+          - CSV file has been reset for next batch
+          
+          ### 🔍 Monitor Progress
+          - [CodePipeline](https://ap-south-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/ct-aft-account-request/view)
+          - [Organizations](https://console.aws.amazon.com/organizations/v2/home/accounts)
+          - [DynamoDB](https://ap-south-1.console.aws.amazon.com/dynamodbv2/home?region=ap-south-1#table?name=aft-request)
+          
+          ---
+          🤖 **Automated by AFT** | 💰 **Budget: $200/account**
+          EOF
+
+
