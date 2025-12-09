@@ -321,3 +321,36 @@ module "testwithoutnat_1765202325" {
 
   account_customizations_name = "sandbox"
 }
+
+# E2E Test - 2025-12-09 09:04:03
+module "e2e_test_1765251243" {
+  source = "./modules/aft-account-request"
+
+  control_tower_parameters = {
+    AccountEmail              = "ravish.snkhyn+e2etest1765251243@gmail.com"
+    AccountName               = "E2ETest0904"
+    ManagedOrganizationalUnit = "LearnMck"
+    SSOUserEmail              = "ravish.snkhyn@gmail.com"
+    SSOUserFirstName          = "Ravish"
+    SSOUserLastName           = "Sankhyan"
+  }
+
+  account_tags = {
+    "Environment" = "Test"
+    "ManagedBy"   = "AFT"
+    "Purpose"     = "E2E-Final-Test"
+    "TestDate"    = "2025-12-09"
+  }
+
+  change_management_parameters = {
+    change_requested_by = "ravish_sankhyan-guva"
+    change_reason       = "Final E2E test - Lambda VPC removed, NAT deleted"
+  }
+
+  custom_fields = {
+    test_type = "e2e_final"
+    timestamp = "1765251243"
+  }
+
+  account_customizations_name = "sandbox"
+}
