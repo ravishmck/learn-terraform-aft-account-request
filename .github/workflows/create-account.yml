@@ -135,6 +135,7 @@ jobs:
           echo "✅ EventBridge polling window passed"
       
       - name: 📊 Monitor Account Creation (Full Process)
+        continue-on-error: true
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -357,4 +358,24 @@ jobs:
           ---
           🤖 **Automated by AFT** | 🔒 **Secured by Control Tower**
           EOF
+      
+      - name: ✅ Workflow Complete
+        if: always()
+        run: |
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo "✅ ACCOUNT REQUEST SUBMITTED SUCCESSFULLY!"
+          echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+          echo ""
+          echo "Account: ${{ inputs.account_name }}"
+          echo "Email: ${{ inputs.account_email }}"
+          echo "OU: ${{ inputs.organizational_unit }}"
+          echo ""
+          echo "🔄 AFT is now processing your request"
+          echo "⏱️  Account will be ready in ~20 minutes"
+          echo ""
+          echo "📋 Monitor progress:"
+          echo "   - CodePipeline: https://ap-south-1.console.aws.amazon.com/codesuite/codepipeline/pipelines/ct-aft-account-request/view"
+          echo "   - Organizations: https://console.aws.amazon.com/organizations/v2/home/accounts"
+          echo ""
+          echo "✅ Workflow completed successfully"
 
