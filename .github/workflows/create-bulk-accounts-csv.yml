@@ -45,6 +45,8 @@ jobs:
           
           COUNTER=0
           ACCOUNT_NAMES=""
+          GITHUB_ACTOR="${{ github.actor }}"
+          GITHUB_RUN_ID="${{ github.run_id }}"
           
           # Process each line
           while IFS=',' read -r NAME EMAIL OU ENV || [ -n "$NAME" ]; do
@@ -74,7 +76,7 @@ jobs:
 # ═══════════════════════════════════════════════════════════════
 # Bulk CSV Request #${COUNTER}: $NAME
 # Created: $(date '+%Y-%m-%d %H:%M:%S UTC')
-# Requested by: ${{ github.actor }}
+# Requested by: ${GITHUB_ACTOR}
 # ═══════════════════════════════════════════════════════════════
 module "${MODULE_NAME}" {
   source = "./modules/aft-account-request"
@@ -91,7 +93,7 @@ module "${MODULE_NAME}" {
   account_tags = {
     "Environment"  = "$ENV"
     "ManagedBy"    = "AFT"
-    "RequestedBy"  = "${{ github.actor }}"
+    "RequestedBy"  = "${GITHUB_ACTOR}"
     "CreatedDate"  = "$(date +%Y-%m-%d)"
     "CreatedVia"   = "GitHub-Actions-Bulk-CSV"
     "BatchNumber"  = "$TIMESTAMP"
@@ -99,13 +101,13 @@ module "${MODULE_NAME}" {
   }
 
   change_management_parameters = {
-    change_requested_by = "${{ github.actor }}"
+    change_requested_by = "${GITHUB_ACTOR}"
     change_reason       = "Bulk account creation (CSV) via GitHub Actions"
   }
 
   custom_fields = {
-    workflow_run_id = "${{ github.run_id }}"
-    github_actor    = "${{ github.actor }}"
+    workflow_run_id = "${GITHUB_RUN_ID}"
+    github_actor    = "${GITHUB_ACTOR}"
     batch_timestamp = "$TIMESTAMP"
     batch_position  = "$COUNTER"
     batch_total     = "$ACCOUNT_COUNT"
